@@ -24,6 +24,17 @@ const update = () => {
     m,
     c;
 
+  // points
+  for (let i = 0; i < Points.length; i++) {
+    let x = Points[i].x,
+      y = Points[i].y;
+    ctx.beginPath();
+    ctx.fillStyle = "#00ffff";
+    ctx.arc(x, y, 100, 0, Math.PI * 2, false);
+    ctx.fill();
+    draw_points_text(x, y, "#fff");
+  }
+
   // find the min of grap
   if (Points.length > 1) {
     for (let i = 0; i < Points.length; i++) {
@@ -51,38 +62,52 @@ const update = () => {
     // find the all paths y
     for (let i = 0; i < Points.length; i++) {
       path.push(m * Points[i].x + c);
-    } 
+    }
 
     // draw linear line
     ctx.strokeStyle = "#ffffff";
     ctx.lineWidth = 50;
     ctx.beginPath();
     ctx.moveTo(Points[0].x, path[0]);
+    let array = Points.map((e) => e.x);
+    let minX = Math.min(...array);
+    let maxX = Math.max(...array);
+    let maxI = Points.map((e, i) => (e.x == maxX ? i : 0));
 
     for (let i = 1; i < Points.length; i++) {
       ctx.lineTo(Points[i].x, path[i]);
+      if(path[Math.max(...maxI)] != path[i]){
+        draw_points_text(Points[i].x, path[i], "#f00");
+      }
     }
     ctx.stroke();
 
     // draw cnaction
     for (let i = 0; i < Points.length; i++) {
-        ctx.strokeStyle = "#fff000";
-        ctx.lineWidth = 10;
-        ctx.beginPath();
-        ctx.moveTo(Points[i].x, Points[i].y);
-        ctx.lineTo(Points[i].x, path[i]);
-        ctx.stroke();
+      ctx.strokeStyle = "#fff000";
+      ctx.lineWidth = 10;
+      ctx.beginPath();
+      ctx.moveTo(Points[i].x, Points[i].y);
+      ctx.lineTo(Points[i].x, path[i]);
+      ctx.stroke();
     }
-  }
 
-  // points
-  for (let i = 0; i < Points.length; i++) {
-    ctx.beginPath();
-    ctx.fillStyle = "#00ffff";
-    ctx.arc(Points[i].x, Points[i].y, 100, 0, Math.PI * 2, false);
-    ctx.fill();
+    draw_points_text(maxX, path[Math.max(...maxI)] - 100, "#00f");
+    draw_points_text(minX, path[0] - 100, "#00f");
+
   }
 };
+
+// draw text
+function draw_points_text(x, y, color) {
+  ctx.font = "70px Arial";
+  ctx.fillStyle = color;
+  ctx.fillText(
+    `(${Math.floor(x / 100)}, ${Math.floor(y / 100)})`,
+    x,
+    y - 100
+  );
+}
 
 update();
 cvs.addEventListener("click", (e) => {
